@@ -2,5 +2,4 @@ from Mailer import Mailer
 
 mailer = Mailer()
 mailer.get_data()
-mailer.send_email('testimg.jpg')
-mailer.send_email('Test Image.mp4')
+mailer.send_pic_and_vid()

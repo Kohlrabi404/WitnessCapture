@@ -3,6 +3,7 @@
 import picamera
 from pathlib import Path
 import time
+import subprocess
 #import date
 import RPi.GPIO as GPIO
 
@@ -34,16 +35,24 @@ class Data :
 			if GPIO.input(self.SENSOR_PIN) == GPIO.HIGH:
 				time.sleep(self.CHECKTIME)
 				if GPIO.input(self.SENSOR_PIN) == GPIO.HIGH:
-					directory = Path.cwd()
+					# Create Image file
+					directory = Path.cwd()/"data"
 					fname = time.strftime("%Y-%m-%d %H:%M:%S")
 					picname = fname + '.jpg'
 					self.cam.capture(directory/picname)
 					time.sleep(self.SLEEPTIME)
 
-					vidname = 'video' + time.strftime("%Y-%m-%d %H:%M:%S") + '.jpg'
-					self.cam.start_recording(directory/vidname)
+
+					# Create Video file
+					vidname = 'video' + time.strftime("%Y-%m-%d %H:%M:%S")
+					vidname_mp4 = vidname + ".mp4"
+					vidname_h264 = vidname + ".h264"
+					self.cam.start_recording(directory/vidname_h264)
 					time.sleep(self.WAITTIME)
 					self.cam.stop_recording()
 					time.sleep(self.SLEEPTIME)
+					# Convert to mp4
+					cmd = f"MP4Box -add {directory/vidname_h264} {directory/vidname_mp4}"
+					subprocess.call(cmd, shell=True)
 
-					return [fname, directory/picname, directory/vidname]
+					return [fname, str(directory/picname), str(directory/vidname_mp4)]
